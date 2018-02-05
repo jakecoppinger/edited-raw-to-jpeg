@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -e
+
+input_dir=$1
+output_dir=$2
+
+# Remove trailing slashes
+input_dir=$(echo "${input_dir}" | sed "s/\/$//")
+output_dir=$(echo "${output_dir}" | sed "s/\/$//")
+
+dng_converter_extension="dng"
+
+if [ "$#" -ne 2 ]; then
+    echo "edited-raw-to-jpeg, Jake Coppinger 2018"
+    echo
+    echo "Converts a folder of RAW images to JPEGs and copies to another folder, macOS only."
+    echo "Will attempt to convert all files in the input folder (excluding xmp files of course)."
+    echo
+    echo "Requires Adobe DNG Converter in the Applications folder"
+    echo "('/Applications/Adobe DNG Converter.app/Contents/MacOS/Adobe DNG Converter' is run)"
+    echo
+    echo "Usage:"
+    echo "./dng-to-jpeg INPUT_DIR OUTPUT_DIR"
+    echo "eg:"
+    echo "./dng-to-jpeg in out"
+
+    exit 1
+fi
+
+echo "Running through Adobe DNG Converter..."
+shopt -s extglob
+"/Applications/Adobe DNG Converter.app/Contents/MacOS/Adobe DNG Converter" --args -p2 -d "${output_dir}/" "${input_dir}"/!(*@(.xmp))
+shopt -u extglob
+
+echo
+echo "Extracting JPEG from DNG..."
+ufraw-batch --embedded-image --out-path="${output_dir}/" "${output_dir}/"*."${dng_converter_extension}"
+
+echo
+echo "Removing .embedded from filenames..."
+for i in out/*
+    do 
+    mv "$i" "${i/\.embedded/}"
+done
+
+echo
+echo "Removing copied DNGs..."
+rm -r ./"${output_dir}"/*.dng
+
+echo "Done."
+echo
