@@ -29,7 +29,7 @@ fi
 
 echo "Running through Adobe DNG Converter..."
 shopt -s extglob
-"/Applications/Adobe DNG Converter.app/Contents/MacOS/Adobe DNG Converter" --args -p2 -d "${output_dir}/" "${input_dir}"/!(*@(.xmp))
+"/Applications/Adobe DNG Converter.app/Contents/MacOS/Adobe DNG Converter" --args -p2 -d "${output_dir}/" "${input_dir}"/!(*@(.xmp|.yaml|.yml|.txt|.md))
 shopt -u extglob
 
 echo
@@ -38,14 +38,14 @@ ufraw-batch --embedded-image --out-path="${output_dir}/" "${output_dir}/"*."${dn
 
 echo
 echo "Removing .embedded from filenames..."
-for i in out/*
+for i in "${output_dir}/"*
     do 
     mv "$i" "${i/\.embedded/}"
 done
 
 echo
 echo "Removing copied DNGs..."
-rm -r ./"${output_dir}"/*.dng
+rm -r "${output_dir}"/*.dng
 
 echo "Done."
 echo
