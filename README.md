@@ -19,7 +19,7 @@ See the manual [here](http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/
 ## ufraw-batch
 
 ```
-brew install ufraw-batch
+brew install ufraw
 ```
 
 Or head to http://ufraw.sourceforge.net/Guide.html
