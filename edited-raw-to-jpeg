@@ -9,6 +9,7 @@ input_dir=$(echo "${input_dir}" | sed "s/\/$//")
 output_dir=$(echo "${output_dir}" | sed "s/\/$//")
 
 dng_converter_extension="dng"
+jpeg_extension="jpg"
 
 if [ "$#" -ne 2 ]; then
     echo "edited-raw-to-jpeg, Jake Coppinger 2018"
@@ -33,14 +34,21 @@ shopt -s extglob
 shopt -u extglob
 
 echo
-echo "Extracting JPEG from DNG..."
-ufraw-batch --embedded-image --out-path="${output_dir}/" "${output_dir}/"*."${dng_converter_extension}"
+echo "Extracting JPEGs from DNGs..."
 
-echo
-echo "Removing .embedded from filenames..."
-for i in "${output_dir}/"*
-    do 
-    mv "$i" "${i/\.embedded/}"
+for dngfilename in "${output_dir}/"*."${dng_converter_extension}"
+    do
+    newfilename=$(echo "${dngfilename}" | sed "s/.dng$/.${jpeg_extension}/")
+
+    # Get rotation of RAW image
+    rotation=$(exiftool -Orientation# "${dngfilename}" | sed -E "s/^.*: //")
+
+    # Extract JPEG from DNG
+    exiftool -b -JpgFromRaw "${dngfilename}" > "${newfilename}"
+
+    # Setting rotation
+    exiftool -Orientation#="${rotation}" "${newfilename}" -overwrite_original_in_place
+
 done
 
 echo
