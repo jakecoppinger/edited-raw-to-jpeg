@@ -48,12 +48,15 @@ for dngfilename in "${output_dir}/"*."${dng_converter_extension}"
 
     # Setting rotation
     exiftool -Orientation#="${rotation}" "${newfilename}" -overwrite_original_in_place
-
 done
 
 echo
 echo "Removing copied DNGs..."
 rm -r "${output_dir}"/*.dng
+
+echo
+echo "Burning EXIF orientation using mogrify -auto-orient..."
+mogrify -auto-orient "${output_dir}/"*
 
 echo "Done."
 echo
